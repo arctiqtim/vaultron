@@ -8,6 +8,9 @@
 # shellcheck disable=SC1091
 #
 
+read -s -p "Enter Password for sudo: " sudoPW
+
+
 . ./skydome
 
 if [ -z "$(command -v terraform)" ]; then
@@ -24,36 +27,36 @@ fi
 
 # Remove Consul client data
 
-rm -rf ./consul/consulc0
+echo $sudoPW | sudo -S rm -rf ./consul/consulc0
 errors=$((errors + $?))
-rm -rf ./consul/consulc1
+echo $sudoPW | sudo -S rm -rf ./consul/consulc1
 errors=$((errors + $?))
-rm -rf ./consul/consulc2
+echo $sudoPW | sudo -S rm -rf ./consul/consulc2
 errors=$((errors + $?))
 
 # Remove Consul server data
 
-rm -rf ./consul/consuls0
+echo $sudoPW | sudo -S rm -rf ./consul/consuls0
 errors=$((errors + $?))
-rm -rf ./consul/consuls1
+echo $sudoPW | sudo -S rm -rf ./consul/consuls1
 errors=$((errors + $?))
-rm -rf ./consul/consuls2
+echo $sudoPW | sudo -S rm -rf ./consul/consuls2
 errors=$((errors + $?))
 
 # Remove Vault server data
 
-rm -rf ./vault/vault0
+echo $sudoPW | sudo -S rm -rf ./vault/vault0
 errors=$((errors + $?))
-rm -rf ./vault/vault1
+echo $sudoPW | sudo -S rm -rf ./vault/vault1
 errors=$((errors + $?))
-rm -rf ./vault/vault2
+echo $sudoPW | sudo -S rm -rf ./vault/vault2
 errors=$((errors + $?))
 rm -f ./vault/vault_DEV_ONLY*.tmp
 errors=$((errors + $?))
 
 # Remove Telemetry data
 
-rm -rf ./grafana
+echo $sudoPW | sudo -S rm -rf ./grafana
 errors=$((errors + $?))
 
 # Remove Terraform state, plans, backend configuration, and logs
@@ -62,7 +65,7 @@ rm -f ./tfstate/terraform.tfstate*
 errors=$((errors + $?))
 rm -f ./tfstate/vaultron*.plan
 errors=$((errors + $?))
-rm -rf ./.terraform/modules
+echo $sudoPW | sudo -S rm -rf ./.terraform/modules
 errors=$((errors + $?))
 rm -f ./.terraform/terraform.tfstate*
 errors=$((errors + $?))

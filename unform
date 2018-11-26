@@ -25,6 +25,11 @@ if ! destroy; then
   msg alert "Terraform destroy failed, infrastructure may still exist."
 fi
 
+# Remove Jenkins Server data
+
+# echo $sudoPW | sudo -S rm -rf ./jenkins/data
+# errors=$((errors + $?))
+
 # Remove Consul client data
 
 echo $sudoPW | sudo -S rm -rf ./consul/consulc0

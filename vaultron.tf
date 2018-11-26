@@ -156,7 +156,7 @@ variable "consul_custom_instance_count" {
 
 # Set TF_VAR_vaultron_telemetry_count to set this (either 0 or 1)
 variable "vaultron_telemetry_count" {
-  default = "1"
+  default = "0"
 }
 
 # Set TF_VAR_grafana_version to set this
@@ -220,4 +220,9 @@ module "vaultron" {
   vault_version                = "${var.vault_version}"
   vaultron_telemetry_count     = "${var.vaultron_telemetry_count}"
   statsd_ip                    = "${module.telemetry.statsd_ip}"
+}
+
+module "jenkins" {
+  source            = "blue_lion"
+  consul_server_ips = ["${module.consul_cluster.consul_oss_server_ips}"]
 }

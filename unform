@@ -27,7 +27,7 @@ fi
 
 # Remove Jenkins Server data
 
-# echo $sudoPW | sudo -S rm -rf ./jenkins/data
+# echo $sudoPW | sudo -S rm -rf ./jenkins/*
 # errors=$((errors + $?))
 
 # Remove Consul client data

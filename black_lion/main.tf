@@ -211,80 +211,75 @@ data "template_file" "vault_custom_config" {
 # -----------------------------------------------------------------------
 
 resource "docker_container" "vault_custom_server" {
-  count      = "${var.vault_custom_instance_count}"
-  name       = "vaultron-${format("vault%d", count.index)}"
-  image      = "${docker_image.vault.latest}"
-  entrypoint = ["/vault/custom/vault", "server", "-log-level=${var.vault_server_log_level}", "-config=/vault/config"]
+  count = "${var.vault_custom_instance_count}"
+  name  = "vaultron-${format("vault%d", count.index)}"
+  image = "${var.vault_ent_id}"
+
+  # entrypoint = ["/vault/custom/vault", "server", "-log-level=${var.vault_server_log_level}", "-config=/vault/config"]
 
   env = ["VAULT_CLUSTER_INTERFACE=eth0",
     "VAULT_REDIRECT_INTERFACE=eth0",
   ]
-
+  command = [
+    "sh",
+    "-c",
+    "VAULT_API_ADDR='http://$(ip addr show eth0 | grep global | awk '{ print $2 }' | awk -F '/' '{ print $1}'):8200' VAULT_CLUSTER_ADDR='https://$(ip addr show eth0 | grep global | awk '{ print $2 }' | awk -F '/' '{ print $1}'):8201'; vault server -log-level=${var.vault_server_log_level} -config=/vault/config",
+  ]
   hostname   = "${format("vault%d", count.index)}"
   domainname = "consul"
   dns        = ["${var.consul_server_ips}"]
   dns_search = ["consul"]
-
   labels = {
     robot = "vaultron"
   }
-
   must_run = true
-
   capabilities {
     add = ["IPC_LOCK"]
   }
 
-  volumes {
-    host_path      = "${path.module}/../../../custom/"
-    container_path = "/vault/custom"
-  }
+  # volumes {
+  #   host_path      = "${path.module}/../../../custom/"
+  #   container_path = "/vault/custom"
+  # }
 
   volumes {
     host_path      = "${path.module}/../../../vault/vault${count.index}/audit_log"
     container_path = "/vault/logs"
   }
-
   volumes {
     host_path      = "${path.module}/../../../vault/vault${count.index}/config"
     container_path = "/vault/config"
   }
 
-  volumes {
-    host_path      = "${path.module}/../../../vault/vault${count.index}/data"
-    container_path = "/vault/data"
-  }
+  # volumes {
+  #   host_path      = "${path.module}/../../../vault/vault${count.index}/data"
+  #   container_path = "/vault/data"
+  # }
 
   volumes {
     host_path      = "${path.module}/../../../vault/plugins"
     container_path = "/vault/plugins"
   }
-
   upload {
     content = "${element(data.template_file.vault_custom_config.*.rendered, count.index)}"
     file    = "/vault/config/main.hcl"
   }
-
   upload {
     content = "${data.template_file.telemetry_config.rendered}"
     file    = "${ var.vaultron_telemetry_count ? "/vault/config/telemetry.hcl" : "/tmp/telemetry.hcl" }"
   }
-
   upload {
     content = "${data.template_file.ca_bundle.rendered}"
     file    = "/etc/ssl/certs/ca-bundle.pem"
   }
-
   upload {
     content = "${element(data.template_file.vault_custom_tls_cert.*.rendered, count.index)}"
     file    = "/etc/ssl/certs/vault-server.crt"
   }
-
   upload {
     content = "${element(data.template_file.vault_custom_tls_key.*.rendered, count.index)}"
     file    = "/etc/ssl/vault-server.key"
   }
-
   ports {
     internal = "8200"
     external = "${format("82%d0", count.index)}"

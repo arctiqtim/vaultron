@@ -53,7 +53,7 @@ variable "use_vault_oss" {
 
 # Set TF_VAR_vault_ent_id to set this
 variable "vault_ent_id" {
-  default = "vault:latest"
+  default = "vault:custom"
 }
 
 # Set TF_VAR_vault_path to set this
@@ -73,12 +73,12 @@ variable "disable_clustering" {
 
 # Set TF_VAR_vault_oss_instance_count to set this
 variable "vault_oss_instance_count" {
-  default = "3"
+  default = "0"
 }
 
 # Set TF_VAR_vault_custom_instance_count to set this
 variable "vault_custom_instance_count" {
-  default = "0"
+  default = "3"
 }
 
 # Set TF_VAR_vault_custom_config_template to set this
@@ -222,7 +222,8 @@ module "vaultron" {
   statsd_ip                    = "${module.telemetry.statsd_ip}"
 }
 
-module "jenkins" {
-  source            = "blue_lion"
-  consul_server_ips = ["${module.consul_cluster.consul_oss_server_ips}"]
-}
+# module "jenkins" {
+#   source            = "blue_lion"
+#   consul_server_ips = ["${module.consul_cluster.consul_oss_server_ips}"]
+# }
+
